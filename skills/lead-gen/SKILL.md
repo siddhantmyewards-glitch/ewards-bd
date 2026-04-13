@@ -38,7 +38,7 @@ Every time /lead-gen is triggered, **start fresh**. Do NOT carry over context fr
 Options: Delhi NCR | Mumbai | Bangalore | Chennai | Hyderabad | Pune | Kolkata
 
 **2. Vertical?**
-Options: Current POS | New POS | Third-party Vendors | Individual Referrals | Channel Distributors
+Options: Current POS | New POS | Current Third-Party Vendors | New Third-Party Vendors | Individual Referrals | Channel Distributors
 
 **3. How many leads?** (default: 30)
 
@@ -47,9 +47,11 @@ Wait for the user to answer before proceeding. Do NOT assume answers from previo
 ### Step 1: Parse the Response
 
 From the user's answers, extract:
-- **Company type** — derived from the vertical (e.g., "Current POS" -> POS software companies, "Channel Distributors" -> IT distributors/resellers)
+- **Company type** — derived from the vertical (e.g., "Current POS" -> POS software companies, "Current Third-Party Vendors" -> the 5 existing third-party vendor partners, "New Third-Party Vendors" -> new vendor companies, "Channel Distributors" -> IT distributors/resellers)
 - **City** — the selected city
 - **Volume** — how many leads they want (default: 30 if not specified)
+
+**Current Third-Party Vendors shortcut:** If the user picks **Current Third-Party Vendors**, the company list is already known — Shiprocket, WATI, SPUR, GoKwik, Smartping (from company.md). **Skip Step 2 entirely** and go straight to Step 3 (LinkedIn people search) using these 5 companies. This works exactly like "Current POS" — the companies are pre-defined, you only need to find people at them in the selected city.
 
 ### Step 2: Find Company Names (Web Search)
 
@@ -62,6 +64,8 @@ Use web_search ONLY to discover company names and websites. Do NOT use web searc
 - Check directories like IndiaMART, Tracxn, SoftwareSuggest for company lists
 
 For each company, also capture its **vertical / nature** — a short label describing what the company does (e.g., "CPaaS / UCaaS", "POS Software", "Retail Tech", "F&B Consulting", "Loyalty Platform"). This comes from the LinkedIn company page tagline, website, or search snippet. Keep it to 3-5 words max.
+
+**Search priority:** Always prioritize **Retail POS / Retail Tech** companies over restaurant-only or F&B-only POS companies. Retail tech companies are the highest-value targets for eWards partnerships. When ordering the company list for people search, put retail-focused companies first.
 
 Output: a list of company names + verticals + websites (where available).
 

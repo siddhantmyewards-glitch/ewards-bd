@@ -102,10 +102,10 @@ def push_to_sheet(client, sheet_id, data, label):
             company_name,
             c.get("vertical", ""),
             c.get("website", ""),
-            c.get("linkedin_url", ""),
+            c.get("linkedin", c.get("linkedin_url", "")),
             p.get("name", ""),
             p.get("designation", ""),
-            p.get("linkedin_url", ""),
+            p.get("linkedin", p.get("linkedin_url", "")),
         ])
 
     ws = spreadsheet.add_worksheet(
