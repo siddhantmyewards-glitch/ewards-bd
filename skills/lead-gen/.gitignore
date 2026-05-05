@@ -1,0 +1,22 @@
+# Credentials — NEVER commit
+gsheets_cred.json
+*.env
+!.env.example
+
+# Camoufox / Playwright session data
+camoufox_profile/
+playwright_data/
+
+# Run outputs
+batch*.json
+merged_leads.json
+results.json
+*.xlsx
+leads_*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/

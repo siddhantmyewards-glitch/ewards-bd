@@ -9,6 +9,8 @@ You find companies and employees for eWards partnership development. You output 
 
 **Output columns:** Company Name | Vertical / Nature | Website URL | Person Name | Designation | Person LinkedIn
 
+> **First-time setup on a new machine:** see [`SETUP.md`](SETUP.md). It covers Python deps, Camoufox browser fetch, Google Sheets service-account credentials, and the one-time LinkedIn login. Skip this section once setup is done.
+
 ## Critical Rules
 
 1. **NEVER fabricate data.** Every URL, name, and designation must come from a real search result or a LinkedIn page you visited. If you didn't see it, it doesn't go in the sheet.
@@ -83,12 +85,13 @@ Ask: **"Does this company's PRIMARY product generate a bill at a physical store 
 
 ## Browser Setup: Camoufox Anti-Detect Browser
 
-All LinkedIn browsing uses **Camoufox** -- an anti-detect browser based on Firefox that prevents LinkedIn from detecting bot activity.
+All LinkedIn browsing uses **Camoufox** -- an anti-detect browser based on Firefox that prevents LinkedIn from detecting bot activity. Setup is described in [`SETUP.md`](SETUP.md); this section covers how the script uses it at runtime.
 
-**Installation paths:**
-- Binary: `C:/camoufox_bin/camoufox.exe`
-- Profile/session data: `C:/camoufox_linkedin/`
-- Saved fingerprint: `C:/camoufox_linkedin/fingerprint.json`
+**Default paths (override via env vars in `.env`):**
+- Binary: bundled with the `camoufox` Python package, downloaded once via `python -m camoufox fetch`. Override with `EWARDS_CAMOUFOX_EXE` only if you have a hand-installed binary.
+- Profile/session data: `~/.ewards-lead-gen/camoufox_profile/` (cross-platform). Override with `EWARDS_CAMOUFOX_PROFILE`.
+- Saved fingerprint: `<profile>/fingerprint.json`.
+- Fingerprint OS: auto-detected from your machine. Override with `EWARDS_CAMOUFOX_OS` (`windows` | `macos` | `linux`).
 
 **How it works:**
 - Camoufox generates a random browser fingerprint (fonts, screen size, user-agent, etc.)
@@ -98,12 +101,17 @@ All LinkedIn browsing uses **Camoufox** -- an anti-detect browser based on Firef
 - Both fixed fingerprint + persistent context = session survives across script runs
 
 **Before every script run, always:**
-1. Kill any zombie Camoufox processes: `powershell -Command "Get-Process camoufox -ErrorAction SilentlyContinue | Stop-Process -Force"`
-2. Remove stale lock files: `rm -f C:/camoufox_linkedin/parent.lock C:/camoufox_linkedin/.parentlock C:/camoufox_linkedin/lock`
+1. Kill any zombie Camoufox processes:
+   - Windows: `powershell -Command "Get-Process camoufox -ErrorAction SilentlyContinue | Stop-Process -Force"`
+   - macOS / Linux: `pkill -f camoufox || true`
+2. Remove stale lock files from the profile dir:
+   - Windows: `rm -f "$HOME/.ewards-lead-gen/camoufox_profile/parent.lock" "$HOME/.ewards-lead-gen/camoufox_profile/.parentlock" "$HOME/.ewards-lead-gen/camoufox_profile/lock"`
+   - macOS / Linux: same command, `$HOME` resolves correctly
+   - If `EWARDS_CAMOUFOX_PROFILE` is set, use that path instead.
 
 **If the browser can't launch** (exitCode=0 error), it's always a zombie process or stale lock. Kill processes and remove locks.
 
-**If the session is lost** (redirects to /login), the user must log in manually. The script opens the login page and waits up to 5 minutes for the user to complete login.
+**If the session is lost** (redirects to /login), the user must log in manually. The script opens the login page and waits up to 5 minutes for the user to complete login. Cookies persist in the profile dir for future runs.
 
 ## Execution Flow
 
@@ -302,10 +310,10 @@ The script maps city names to LinkedIn's location filter labels:
 
 **Push to Google Sheets:**
 ```bash
-python scripts/push_to_gsheet.py --input merged_leads.json --sheet-id GSHEET_ID
+python scripts/push_to_gsheet.py --input merged_leads.json --sheet-id "$GSHEET_ID"
 ```
 
-Read `gsheets_config.env` for the Google Sheet ID: `GSHEET_ID=1NEszZSx42QJ5-x5qCsZm4-2rMpUD1dWeGq62n5BVv3s`
+`GSHEET_ID` is read from `.env` in the skill folder. Default sheet (eWards working sheet): `GSHEET_ID=1NEszZSx42QJ5-x5qCsZm4-2rMpUD1dWeGq62n5BVv3s`. The push script also takes `--cred` (defaults to `gsheets_cred.json` in the working directory — the service-account key, see `SETUP.md`).
 
 This creates a new tab with columns: Company Name | Vertical / Nature | Website URL | Person Name | Designation | Person LinkedIn
 
