@@ -90,7 +90,7 @@ def push_to_sheet(client, sheet_id, data, label):
     tab_name = label[:100]  # Google Sheets tab name limit
 
     header = [
-        "Company Name", "Vertical / Nature", "Website URL", "Company LinkedIn",
+        "Company Name", "Vertical / Nature", "Website URL",
         "Person Name", "Designation", "Person LinkedIn",
     ]
 
@@ -102,7 +102,6 @@ def push_to_sheet(client, sheet_id, data, label):
             company_name,
             c.get("vertical", ""),
             c.get("website", ""),
-            c.get("linkedin", c.get("linkedin_url", "")),
             p.get("name", ""),
             p.get("designation", ""),
             p.get("linkedin", p.get("linkedin_url", "")),
@@ -123,7 +122,7 @@ def push_to_sheet(client, sheet_id, data, label):
     ws.freeze(rows=1)
 
     # Set column widths
-    col_widths = [220, 180, 280, 350, 200, 300, 350]
+    col_widths = [220, 180, 280, 200, 300, 350]
     requests = [
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": i, "endIndex": i + 1},

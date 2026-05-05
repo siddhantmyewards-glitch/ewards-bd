@@ -52,7 +52,7 @@ def create_xlsx(data, output_path):
     ws.title = "Leads"
 
     headers = [
-        "Company Name", "Vertical / Nature", "Website URL", "Company LinkedIn",
+        "Company Name", "Vertical / Nature", "Website URL",
         "Person Name", "Designation", "Person LinkedIn",
     ]
     for col, header in enumerate(headers, 1):
@@ -89,33 +89,21 @@ def create_xlsx(data, output_path):
         cell.alignment = body_alignment
         cell.border = thin_border
 
-        # Company LinkedIn
-        co_li = c.get("linkedin_url", "")
-        cell = ws.cell(row=row_idx, column=4, value=co_li)
-        if co_li:
-            cell.font = link_font
-            try:
-                cell.hyperlink = co_li
-            except Exception:
-                pass
-        cell.alignment = body_alignment
-        cell.border = thin_border
-
         # Person Name
-        cell = ws.cell(row=row_idx, column=5, value=person.get("name", ""))
+        cell = ws.cell(row=row_idx, column=4, value=person.get("name", ""))
         cell.font = body_font
         cell.alignment = body_alignment
         cell.border = thin_border
 
         # Designation
-        cell = ws.cell(row=row_idx, column=6, value=person.get("designation", ""))
+        cell = ws.cell(row=row_idx, column=5, value=person.get("designation", ""))
         cell.font = body_font
         cell.alignment = body_alignment
         cell.border = thin_border
 
         # Person LinkedIn
-        p_li = person.get("linkedin_url", "")
-        cell = ws.cell(row=row_idx, column=7, value=p_li)
+        p_li = person.get("linkedin", person.get("linkedin_url", ""))
+        cell = ws.cell(row=row_idx, column=6, value=p_li)
         if p_li:
             cell.font = link_font
             try:
@@ -129,9 +117,9 @@ def create_xlsx(data, output_path):
     ws.column_dimensions['A'].width = 30
     ws.column_dimensions['B'].width = 25
     ws.column_dimensions['C'].width = 35
-    ws.column_dimensions['D'].width = 45
-    ws.column_dimensions['E'].width = 25
-    ws.column_dimensions['F'].width = 40
+    ws.column_dimensions['D'].width = 25
+    ws.column_dimensions['E'].width = 40
+    ws.column_dimensions['F'].width = 45
     ws.column_dimensions['G'].width = 45
     ws.freeze_panes = "A2"
 
