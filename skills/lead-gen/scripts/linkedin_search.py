@@ -27,17 +27,35 @@ except ImportError:
     sys.exit(1)
 
 # --- Configurable paths (override via env vars; sensible defaults work on any OS) ---
-# Profile dir holds the Camoufox session (cookies, saved fingerprint).
-# Default: ~/.ewards-lead-gen/camoufox_profile/  -- override with EWARDS_CAMOUFOX_PROFILE.
-USER_DATA_DIR = os.environ.get("EWARDS_CAMOUFOX_PROFILE") or str(
-    Path.home() / ".ewards-lead-gen" / "camoufox_profile"
-)
-FINGERPRINT_FILE = str(Path(USER_DATA_DIR) / "fingerprint.json")
 
-# Camoufox binary: leave unset to let the camoufox package use its bundled browser
-# (downloaded once via `python -m camoufox fetch`). Override with EWARDS_CAMOUFOX_EXE
-# only if you have a hand-installed binary at a custom path.
-CAMOUFOX_EXE = os.environ.get("EWARDS_CAMOUFOX_EXE") or None
+# Legacy locations from the original eWards Windows setup. Used as a silent fallback
+# if env vars are unset AND these paths still exist on this machine -- preserves
+# existing logged-in sessions on machines that pre-date the portable setup.
+_LEGACY_PROFILE = "C:/camoufox_linkedin"
+_LEGACY_EXE = "C:/camoufox_bin/camoufox.exe"
+
+
+def _default_profile_dir():
+    """Profile dir holding the Camoufox session (cookies, saved fingerprint)."""
+    if os.environ.get("EWARDS_CAMOUFOX_PROFILE"):
+        return os.environ["EWARDS_CAMOUFOX_PROFILE"]
+    if Path(_LEGACY_PROFILE).is_dir():
+        return _LEGACY_PROFILE
+    return str(Path.home() / ".ewards-lead-gen" / "camoufox_profile")
+
+
+def _default_camoufox_exe():
+    """Hand-installed Camoufox binary path. None = let camoufox package use its bundled browser."""
+    if os.environ.get("EWARDS_CAMOUFOX_EXE"):
+        return os.environ["EWARDS_CAMOUFOX_EXE"]
+    if Path(_LEGACY_EXE).exists():
+        return _LEGACY_EXE
+    return None
+
+
+USER_DATA_DIR = _default_profile_dir()
+FINGERPRINT_FILE = str(Path(USER_DATA_DIR) / "fingerprint.json")
+CAMOUFOX_EXE = _default_camoufox_exe()
 
 # Fingerprint OS: auto-detect, override with EWARDS_CAMOUFOX_OS (windows | macos | linux).
 _PLATFORM_MAP = {"Windows": "windows", "Darwin": "macos", "Linux": "linux"}
